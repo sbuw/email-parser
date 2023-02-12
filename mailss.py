@@ -178,7 +178,7 @@ def mail_save():
 
 	os.chdir(save_folder)
 
-	file = open(f"emails_{len(total_mail_list)}_{dt.now().date()}_r{rdm.randint(1, 19385)}.log", "w", encoding='utf-8')
+	file = open(f"emails_{len(total_mail_list)}_{dt.now().date()}_r{rdm.randint(1, 19385)}.txt", "w", encoding='utf-8')
 
 	fmd = "$$ email parser $$ fmd $$ with <3 from russia $$\n\n"
 	file.write(fmd)
