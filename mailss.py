@@ -3,6 +3,7 @@ from urllib3.exceptions import InsecureRequestWarning
 import time
 from datetime import datetime as dt
 import random as rdm
+import os
 
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
@@ -13,6 +14,7 @@ import re
 # iso-8859-1 windows-1251 latin-1
 
 symbols = "qwertyuiopasdfghjklzxcvbnm1234567890-_.@"
+save_folder = "result"
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -31,6 +33,7 @@ total_mail_list = []
 total_mail_list_for_save = []
 
 start_time = None
+
 
 def valid_url(url):
 	parsed = urlparse(url)
@@ -169,6 +172,12 @@ def mail_print():
 
 def mail_save():
 	global total_mail_list
+
+	if not os.path.isdir(save_folder):
+		os.mkdir(save_folder)
+
+	os.chdir(save_folder)
+
 	file = open(f"emails_{len(total_mail_list)}_{dt.now().date()}_r{rdm.randint(1, 19385)}.log", "w", encoding='utf-8')
 
 	fmd = "$$ email parser $$ fmd $$ with <3 from russia $$\n\n"
@@ -202,8 +211,10 @@ def crawling():
 	print(f"\n[*] Total links: {len(links_list)} -> {len(total_ext_url) +  len(total_int_url)} [{len(total_int_url)}|{len(total_ext_url)}]")
 	print("[*] Total emails: ", len(total_mail_list))
 	print(f"[*] Execution time: {end_time//60}min {end_time%60}sec")
-
-	mail_save()
+	try:
+		mail_save()
+	except:
+		print("[!] Save emails if failed")
 
 
 def add_links():
