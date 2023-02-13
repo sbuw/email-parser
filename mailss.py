@@ -5,13 +5,20 @@ from datetime import datetime as dt
 import random as rdm
 import os
 
+import argparse
+
+import warnings
+from bs4.builder import XMLParsedAsHTMLWarning
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import requests
 import re
 
 
+warnings.filterwarnings('ignore', category=XMLParsedAsHTMLWarning)
+
 # iso-8859-1 windows-1251 latin-1
+# lxml html.parser
 
 symbols = "qwertyuiopasdfghjklzxcvbnm1234567890-_.@"
 save_folder = "result"
@@ -34,6 +41,16 @@ total_mail_list_for_save = []
 
 start_time = None
 
+savefile = None # int 0 or 1
+
+comment = ""
+
+
+def get_args():
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-s", "--savefile", type=int, default=1, dest="savefile", help="saves the final file with mails (0 or 1, default:1)")
+	arguments = parser.parse_args()
+	return arguments
 
 def valid_url(url):
 	parsed = urlparse(url)
@@ -77,7 +94,7 @@ def website_links(url):
 				pass
 		return urls
 	except:
-		print(f"[-] Links Error: {links_list[this_link_number]}")
+		print(f"[-] Couldn't find the links at: {links_list[this_link_number]}")
 
 visited_urls = 0
 
@@ -147,12 +164,14 @@ def mail_parser():
 			try:
 				emails = find_emails_on_a_page(link)
 				for email in emails:
-					is_valid = valid_mail(email)
-					if is_valid == False: continue
-
+					email = email.lower().replace(" ","")
 					if email[-1:] == ".": email = email[:-1]
-
 					if email not in mail_list:
+						is_valid = valid_mail(email)
+						if is_valid == False: continue
+
+						
+					
 						mail_list.append(email)
 						total_mail_list.append(email)
 						total_mail_list_for_save.append(email)
@@ -172,16 +191,20 @@ def mail_print():
 
 def mail_save():
 	global total_mail_list
+	global comment
 
 	if not os.path.isdir(save_folder):
 		os.mkdir(save_folder)
 
 	os.chdir(save_folder)
 
-	file = open(f"emails_{len(total_mail_list)}_{dt.now().date()}_r{rdm.randint(1, 19385)}.txt", "w", encoding='utf-8')
+	file = open(f"emails_{len(total_mail_list)}_{dt.now().date()}_r{rdm.randint(1, 19385)}.log", "w", encoding='utf-8')
 
 	fmd = "$$ email parser $$ fmd $$ with <3 from russia $$\n\n"
 	file.write(fmd)
+	if comment != "":
+		comment_ = f"[*] Comment: {comment}\n"
+		file.write(comment_)
 	mail_count = f"[!] Total emails: {len(total_mail_list)}\n"
 	file.write(mail_count)
 	file.write(f"[{len(links_list)}] ")
@@ -195,6 +218,8 @@ def mail_save():
 def crawling():
 	global start_time
 	global this_link_number
+	global savefile
+	global comment
 	start_time = time.time()
 
 	for link in links_list:
@@ -211,17 +236,46 @@ def crawling():
 	print(f"\n[*] Total links: {len(links_list)} -> {len(total_ext_url) +  len(total_int_url)} [{len(total_int_url)}|{len(total_ext_url)}]")
 	print("[*] Total emails: ", len(total_mail_list))
 	print(f"[*] Execution time: {end_time//60}min {end_time%60}sec")
+	if comment != "":
+		print(f"[*] Comment: {comment}")
 	try:
-		mail_save()
+		if savefile == 1:
+			mail_save()
+		elif savefile == 0:
+			print("[!] File with mails will not be saved because -s parameter has a value of 0")
 	except:
-		print("[!] Save emails if failed")
+		print("[!] Save file with emails is failed")
 
+def get_options():
+	global savefile
+	options = get_args()
+	_savefile = options.savefile
+
+	if _savefile != 0 and _savefile != 1:
+		_savefile = 1
+
+	savefile = _savefile
+
+	if savefile == 0: print("[!] Attention, the final file will not be saved!\n")
+	elif savefile == 1: print("[!] Attention, the final file will be saved!\n")
+
+def get_comment():
+	global comment
+	print("[*] Write a comment if required: ", end='')
+	_comment = input()
+	print()
+	if _comment.replace(" ","") == "": _comment = ""
+	comment = _comment
 
 def add_links():
-	links_count = 0
 	try:
+		get_options()
+		get_comment()
+
+		links_count = 0
+
 		while True:
-			print("\r["+str(links_count)+"] Write link | 0 for continue: ", end = '')
+			print(f"[{links_count}] Write link | 0 for continue: ", end = '')
 			link = input().replace(" ","")
 			if link == "0":
 				break
@@ -240,6 +294,7 @@ def add_links():
 			crawling()
 	except KeyboardInterrupt:
 		print("\n[-] ctrl + c\n")
+
 
 if __name__ == "__main__":
 	add_links()

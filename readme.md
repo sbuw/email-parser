@@ -13,6 +13,11 @@ Everyone uses this tool for their own purposes ;)
 - Enter the addresses one by one, then write 0 to start the process of receiving email
 - After the end of the process we get the emails from the console, and also from the file that will be created after the end of the process
 
+### • New
+- I added the -s argument (more details -h), which determines whether to save the file with the mails or not
+- Changed the mail repetition check
+- Added an option to leave a comment
+
 ### • Attention
 ***I do not warrant and completely disclaim any responsibility for your actions using this tool
 This tool is for informational purposes only!
