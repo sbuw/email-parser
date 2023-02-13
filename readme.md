@@ -14,7 +14,8 @@ Everyone uses this tool for their own purposes ;)
 - After the end of the process we get the emails from the console, and also from the file that will be created after the end of the process
 
 ### • New
-- I added the -s argument (more details -h), which determines whether to save the file with the mails or not
+- Added argument -s (more details -h), which determines whether to save the file with the mails or not
+- Added argument -l (more details -h), which is responsible for mail output to the console (0-does not output, 1-gives the number of mails, 2-gives the number and list of mails)
 - Changed the mail repetition check
 - Added an option to leave a comment
 

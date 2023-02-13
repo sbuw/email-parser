@@ -45,10 +45,13 @@ savefile = None # int 0 or 1
 
 comment = ""
 
+log_lvl = None # 0 1 2
+
 
 def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-s", "--savefile", type=int, default=1, dest="savefile", help="saves the final file with mails (0 or 1, default:1)")
+	parser.add_argument("-l", "--loglvl", type=int, default=2, dest="loglvl", help="which is responsible for mail output to the console (0-does not output, 1-gives the number of mails, 2-gives the number and list of mails, by default 2)")
 	arguments = parser.parse_args()
 	return arguments
 
@@ -184,7 +187,14 @@ def mail_parser():
 
 def mail_print():
 	global this_link_number
+	global log_lvl
+
+	if log_lvl == 0: return print()
+
 	print(f"[*] Emails [{len(mail_list)}] : {links_list[this_link_number]} [{this_link_number+1}/{len(links_list)}]")
+
+	if log_lvl == 1: return print()
+
 	for mail in mail_list:
 		print(mail)
 	print()
@@ -220,6 +230,8 @@ def crawling():
 	global this_link_number
 	global savefile
 	global comment
+	global log_lvl
+
 	start_time = time.time()
 
 	for link in links_list:
@@ -236,8 +248,8 @@ def crawling():
 	print(f"\n[*] Total links: {len(links_list)} -> {len(total_ext_url) +  len(total_int_url)} [{len(total_int_url)}|{len(total_ext_url)}]")
 	print("[*] Total emails: ", len(total_mail_list))
 	print(f"[*] Execution time: {end_time//60}min {end_time%60}sec")
-	if comment != "":
-		print(f"[*] Comment: {comment}")
+	if comment != "": print(f"[*] Comment: {comment}")
+	print(f"[*] Log level: {log_lvl}")
 	try:
 		if savefile == 1:
 			mail_save()
@@ -246,15 +258,23 @@ def crawling():
 	except:
 		print("[!] Save file with emails is failed")
 
-def get_options():
+def get_set_options():
 	global savefile
+	global log_lvl
+
 	options = get_args()
 	_savefile = options.savefile
+	_loglvl = options.loglvl
 
 	if _savefile != 0 and _savefile != 1:
 		_savefile = 1
 
 	savefile = _savefile
+
+	if _loglvl != 0 and _loglvl != 1 and _loglvl != 2:
+		_loglvl = 2
+
+	log_lvl = _loglvl
 
 	if savefile == 0: print("[!] Attention, the final file will not be saved!\n")
 	elif savefile == 1: print("[!] Attention, the final file will be saved!\n")
@@ -269,7 +289,7 @@ def get_comment():
 
 def add_links():
 	try:
-		get_options()
+		get_set_options()
 		get_comment()
 
 		links_count = 0
