@@ -47,11 +47,14 @@ comment = ""
 
 log_lvl = None # 0 1 2
 
+filetype = None # .txt .log and more
+
 
 def get_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-s", "--savefile", type=int, default=1, dest="savefile", help="saves the final file with mails (0 or 1, default:1)")
 	parser.add_argument("-l", "--loglvl", type=int, default=2, dest="loglvl", help="which is responsible for mail output to the console (0-does not output, 1-gives the number of mails, 2-gives the number and list of mails, by default 2)")
+	parser.add_argument("-f", "--filetype", default=".txt", dest="filetype", help="is responsible for the file type when saving ( enter a value with a dot, the default is(.txt) )")
 	arguments = parser.parse_args()
 	return arguments
 
@@ -202,13 +205,14 @@ def mail_print():
 def mail_save():
 	global total_mail_list
 	global comment
+	global filetype
 
 	if not os.path.isdir(save_folder):
 		os.mkdir(save_folder)
 
 	os.chdir(save_folder)
 
-	file = open(f"emails_{len(total_mail_list)}_{dt.now().date()}_r{rdm.randint(1, 19385)}.log", "w", encoding='utf-8')
+	file = open(f"emails_{len(total_mail_list)}_{dt.now().date().replace("-","")}_r{rdm.randint(1, 19385)}{filetype}", "w", encoding='utf-8')
 
 	fmd = "$$ email parser $$ fmd $$ with <3 from russia $$\n\n"
 	file.write(fmd)
@@ -261,10 +265,12 @@ def crawling():
 def get_set_options():
 	global savefile
 	global log_lvl
+	global filetype
 
 	options = get_args()
 	_savefile = options.savefile
 	_loglvl = options.loglvl
+	_filetype = options.filetype
 
 	if _savefile != 0 and _savefile != 1:
 		_savefile = 1
@@ -273,6 +279,8 @@ def get_set_options():
 
 	if _loglvl != 0 and _loglvl != 1 and _loglvl != 2:
 		_loglvl = 2
+
+	filetype = _filetype
 
 	log_lvl = _loglvl
 

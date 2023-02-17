@@ -15,7 +15,8 @@ Everyone uses this tool for their own purposes ;)
 
 ### • New
 - Added argument -s (more details -h), which determines whether to save the file with the mails or not
-- Added argument -l (more details -h), which is responsible for mail output to the console (0-does not output, 1-gives the number of mails, 2-gives the number and list of mails)
+- Added argument -l (more details -h), which is responsible for mail output to the console
+- Added argument -f (more details -h), which is responsible for the file type when saving
 - Changed the mail repetition check
 - Added an option to leave a comment
 
